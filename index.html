@@ -16,15 +16,17 @@
             justify-content: center;
             height: 100vh;
             margin: 0;
+            overflow: hidden;
         }
         h1 {
             font-size: 3.5vw;
             font-weight: 500;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            letter-spacing: 1px;
         }
         .profile-container {
             display: flex;
-            gap: 30px;
+            gap: 40px;
         }
         .profile {
             text-align: center;
@@ -35,44 +37,50 @@
             width: 150px;
             height: 150px;
             border-radius: 4px;
-            background-size: cover;
-            background-position: center;
+            position: relative;
+            box-sizing: border-box;
             border: 3px solid transparent;
             transition: border 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        /* Profile 1: Reddish Brown Hair */
-        .avatar-red-brown {
-            background-image: url('https://upload.wikimedia.org/wikipedia/commons/f/fb/Netflix-avatar.png');
+        /* Profile 1: Reddish Brown Hair representation */
+        .avatar-nicole {
+            background-color: #8B4513; 
         }
-        /* Profile 2: Black Hair */
-        .avatar-black-hair {
-            background-image: url('https://occ-0-116-114.1.nflxso.net/dnm/api/v6/K6hjPJd6cR6FpVELC5Pd6ovHRSk/AAAABTYctxxbe-cy9QZSQIP4iXfsW_OBRt6596-C237r7o20Ssh8kU6q8u8s6E2YIasj_D55376IqD541VId7kAsuTyeE237T1q7_g.png?r=8f7');
+        /* Profile 2: Black Hair representation */
+        .avatar-guest {
+            background-color: #000000;
+            border: 1px solid #333;
         }
         .profile:hover .avatar {
-            border-color: white;
+            border-color: #e5e5e5;
         }
         .name {
             margin-top: 15px;
-            color: grey;
+            color: #808080;
             font-size: 1.2vw;
+            transition: color 0.2s;
         }
         .profile:hover .name {
-            color: white;
+            color: #fff;
         }
         .manage-button {
-            margin-top: 60px;
+            margin-top: 80px;
             background: transparent;
-            color: grey;
-            border: 1px solid grey;
-            padding: 10px 25px;
+            color: #808080;
+            border: 1px solid #808080;
+            padding: 10px 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
             cursor: pointer;
             font-size: 1.1vw;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+            transition: all 0.2s;
         }
         .manage-button:hover {
-            color: white;
-            border-color: white;
+            color: #fff;
+            border-color: #fff;
         }
     </style>
 </head>
@@ -81,13 +89,13 @@
     <h1>Who's watching?</h1>
 
     <div class="profile-container">
-        <div class="profile">
-            <div class="avatar avatar-red-brown"></div>
+        <div class="profile" onclick="location.reload()">
+            <div class="avatar avatar-nicole"></div>
             <div class="name">Nicole</div>
         </div>
 
-        <div class="profile">
-            <div class="avatar avatar-black-hair"></div>
+        <div class="profile" onclick="location.reload()">
+            <div class="avatar avatar-guest"></div>
             <div class="name">Guest</div>
         </div>
     </div>
