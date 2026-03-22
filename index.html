@@ -3,270 +3,265 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NIKKIFLIX EMPIRE | THE OPERATING BUILD</title>
+    <title>NIKKIFLIX EMPIRE | 2026 CASINO SUITE</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
-        :root { --gold: #d4af37; --red: #e50914; --glass: rgba(0,0,0,0.8); }
+        :root { 
+            --gold: #c5a059; 
+            --red: #af0404; 
+            --glass: rgba(10, 10, 10, 0.95);
+            --border: 1px solid rgba(197, 160, 89, 0.4);
+        }
         body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        
-        /* UI OVERLAYS */
-        #gui-layer { position: fixed; inset: 0; pointer-events: none; z-index: 100; }
-        .pointer-events { pointer-events: auto; }
-        
-        header { 
-            height: 60px; background: linear-gradient(to bottom, #000, transparent);
-            display: flex; justify-content: space-between; align-items: center; padding: 0 30px;
-        }
 
-        .balance-card { 
-            background: var(--glass); padding: 10px 20px; border-radius: 30px; 
-            border: 1px solid var(--gold); color: var(--gold); font-weight: 900;
+        /* SIDEBAR NAVIGATION */
+        #sidebar {
+            position: fixed; left: 0; top: 0; bottom: 0; width: 260px;
+            background: linear-gradient(180deg, #1a1a1a 0%, #000 100%);
+            border-right: var(--border); z-index: 1000; padding: 30px 15px;
+            display: flex; flex-direction: column; gap: 12px;
         }
-
-        /* GAME HUDs */
-        .game-hud { 
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            display: none; flex-direction: column; align-items: center; gap: 15px;
+        .nav-header { color: var(--gold); font-size: 10px; letter-spacing: 3px; margin-bottom: 20px; text-align: center; }
+        .nav-item {
+            padding: 16px; border-radius: 4px; background: rgba(255,255,255,0.03);
+            color: #ddd; cursor: pointer; text-transform: uppercase;
+            font-size: 13px; font-weight: 600; transition: 0.3s;
+            border-left: 3px solid transparent;
         }
-        .active-hud { display: flex; }
+        .nav-item:hover { background: rgba(197, 160, 89, 0.1); border-left: 3px solid var(--gold); color: var(--gold); }
+        .nav-active { background: rgba(197, 160, 89, 0.2); border-left: 3px solid var(--gold); color: var(--gold); }
 
-        .btn { 
-            background: var(--gold); color: #000; border: none; padding: 15px 30px; 
-            border-radius: 5px; font-weight: bold; cursor: pointer; text-transform: uppercase;
+        /* CHAT & SOCIAL */
+        #social-panel {
+            position: fixed; right: 20px; bottom: 20px; width: 320px; height: 400px;
+            background: var(--glass); border: var(--border); border-radius: 8px;
+            z-index: 1000; display: flex; flex-direction: column;
         }
-        .btn:disabled { background: #444; color: #888; }
+        #chat-window { flex: 1; padding: 15px; overflow-y: auto; font-size: 13px; }
+        .msg { margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px; }
+        .msg .name { color: var(--gold); font-weight: bold; margin-right: 5px; }
 
-        /* PTT STYLING */
-        #ptt-button {
-            width: 70px; height: 70px; border-radius: 50%; background: #222;
-            border: 3px solid var(--gold); pointer-events: auto; display: flex;
-            align-items: center; justify-content: center; font-size: 24px;
-            transition: 0.2s; cursor: pointer;
+        /* HUD */
+        #top-hud {
+            position: fixed; top: 0; left: 260px; right: 0; height: 80px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 40px; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            z-index: 900;
         }
-        #ptt-button.active { background: var(--red); transform: scale(1.1); box-shadow: 0 0 20px var(--red); }
-
-        /* NOTIFICATION */
-        #dealer-msg {
-            position: absolute; top: 100px; width: 100%; text-align: center;
-            font-size: 24px; color: var(--gold); font-weight: bold; text-shadow: 0 0 10px #000;
+        .balance-display {
+            background: #000; border: 1px solid var(--gold); padding: 10px 25px;
+            border-radius: 50px; color: var(--gold); font-size: 20px; font-weight: 800;
+            box-shadow: 0 0 15px rgba(197, 160, 89, 0.2);
         }
 
         /* CARD STYLING */
-        .card-container { display: flex; gap: 10px; margin-bottom: 20px; }
-        .playing-card { 
-            width: 60px; height: 90px; background: white; color: black; 
-            border-radius: 5px; display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 20px; border: 2px solid #ccc;
+        #game-ui {
+            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+            z-index: 1000; display: flex; flex-direction: column; align-items: center;
         }
+        .hand-container { display: flex; gap: 10px; margin-bottom: 20px; }
+        .playing-card {
+            width: 80px; height: 115px; background: #fff; border-radius: 8px;
+            color: #000; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; font-size: 24px; font-weight: bold;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+        .suit-red { color: var(--red); }
+
+        .action-bar { display: flex; gap: 15px; align-items: center; }
+        .btn-play {
+            background: linear-gradient(to bottom, #c5a059, #8e7037);
+            border: none; padding: 18px 45px; border-radius: 4px;
+            font-weight: 900; cursor: pointer; color: #000; font-size: 16px;
+        }
+        #ptt-btn {
+            width: 60px; height: 60px; border-radius: 50%; background: #1a1a1a;
+            border: 2px solid var(--gold); cursor: pointer; display: flex;
+            align-items: center; justify-content: center; font-size: 24px;
+        }
+        #ptt-btn.active { background: var(--red); box-shadow: 0 0 20px var(--red); }
     </style>
 </head>
 <body>
 
-    <div id="gui-layer">
-        <header class="pointer-events">
-            <h1 style="color: var(--red); font-style: italic; letter-spacing: 2px;">NIKKIFLIX EMPIRE</h1>
-            <div class="balance-card">BANK: $<span id="balance">10,000</span></div>
-        </header>
+    <div id="sidebar">
+        <div class="nav-header">NIKKIFLIX EMPIRE OS</div>
+        <div class="nav-item nav-active" onclick="moveTo('lobby')">Casino Lobby</div>
+        <div class="nav-item" onclick="moveTo('table1')">VIP Poker Table 1</div>
+        <div class="nav-item" onclick="moveTo('table2')">VIP Poker Table 2</div>
+        <div class="nav-item" onclick="moveTo('table3')">Blackjack High Limit</div>
+        <div class="nav-item" onclick="moveTo('table4')">Private Friends Table</div>
+        <div class="nav-item" onclick="moveTo('slots')">Empire Slot Row</div>
+    </div>
 
-        <div id="dealer-msg">WALK UP TO A TABLE OR SLOT MACHINE TO PLAY</div>
+    <div id="top-hud">
+        <h2 id="room-title" style="letter-spacing: 2px; color: #fff;">GRAND LOBBY</h2>
+        <div class="balance-display">$<span id="bal-val">100,000</span></div>
+    </div>
 
-        <!-- POKER HUD -->
-        <div id="poker-hud" class="game-hud pointer-events">
-            <div class="card-container" id="player-hand"></div>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn" onclick="pokerEngine.deal()">Deal Hand ($100)</button>
-                <button class="btn" onclick="pokerEngine.hit()" id="hit-btn" disabled>Hit</button>
-                <button class="btn" onclick="pokerEngine.stand()" id="stand-btn" disabled>Stand</button>
-                <div id="ptt-button" onmousedown="startVoice()" onmouseup="stopVoice()">🎤</div>
-            </div>
+    <div id="social-panel">
+        <div style="padding: 10px; background: var(--gold); color: #000; font-weight: bold; font-size: 12px;">LIVE MULTIPLAYER CHAT</div>
+        <div id="chat-window">
+            <div class="msg"><span class="name">Dealer:</span> Welcome to the High Roller Suite.</div>
         </div>
+    </div>
 
-        <!-- SLOTS HUD -->
-        <div id="slots-hud" class="game-hud pointer-events">
-            <button class="btn" style="padding: 25px 60px; font-size: 20px;" onclick="slotEngine.spin()">SPIN REELS ($50)</button>
+    <div id="game-ui">
+        <div class="hand-container" id="player-hand"></div>
+        <div class="action-bar">
+            <button class="btn-play" onclick="dealCards()">DEAL HAND</button>
+            <div id="ptt-btn" onmousedown="toggleMic(true)" onmouseup="toggleMic(false)">🎤</div>
         </div>
-        
-        <!-- ROOM SWITCHER -->
-        <nav style="position: absolute; left: 20px; top: 100px;" class="pointer-events">
-            <button class="btn" onclick="gotoRoom('casino')" style="display: block; margin-bottom: 10px; width: 150px;">Casino</button>
-            <button class="btn" onclick="gotoRoom('poker')" style="display: block; width: 150px;">Poker Room</button>
-        </nav>
     </div>
 
     <script>
-        /** ENGINE SETTINGS **/
-        let balance = 10000;
+        /** THREE.JS ENGINE - HIGH END GRAPHICS **/
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        scene.background = new THREE.Color(0x020202);
+        scene.fog = new THREE.FogExp2(0x020202, 0.015);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
         document.body.appendChild(renderer.domElement);
+
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
 
-        // Lights
-        const ambient = new THREE.AmbientLight(0x404040, 2);
+        // Lighting System
+        const ambient = new THREE.AmbientLight(0xffffff, 0.3);
         scene.add(ambient);
-        const spot = new THREE.PointLight(0xd4af37, 2);
-        spot.position.set(0, 10, 0);
-        scene.add(spot);
 
-        /** 3D WORLD BUILDING **/
-        const floor = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshStandardMaterial({ color: 0x111111 }));
+        // Floor - Polished Black Marble
+        const floorGeo = new THREE.PlaneGeometry(200, 200);
+        const floorMat = new THREE.MeshStandardMaterial({ 
+            color: 0x080808, 
+            metalness: 0.9, 
+            roughness: 0.1 
+        });
+        const floor = new THREE.Mesh(floorGeo, floorMat);
         floor.rotation.x = -Math.PI / 2;
         scene.add(floor);
 
-        // CREATE 3D POKER TABLE (The actual playable object)
-        function createPokerTable() {
-            const tableGroup = new THREE.Group();
-            const top = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 0.5, 32), new THREE.MeshStandardMaterial({ color: 0x076324 }));
-            const rail = new THREE.Mesh(new THREE.TorusGeometry(4, 0.2, 16, 100), new THREE.MeshStandardMaterial({ color: 0x222222 }));
-            rail.rotation.x = Math.PI / 2;
-            tableGroup.add(top, rail);
-            tableGroup.position.set(-10, 1, 0);
-            tableGroup.name = "poker_table";
-            scene.add(tableGroup);
-            return tableGroup;
-        }
-
-        // CREATE 3D SLOT MACHINES
-        let slotReels = [];
-        function createSlotMachine() {
+        /** TABLE BUILDER FUNCTION **/
+        function createProfessionalTable(x, z, label, feltColor) {
             const group = new THREE.Group();
-            const body = new THREE.Mesh(new THREE.BoxGeometry(2, 4, 2), new THREE.MeshStandardMaterial({ color: 0x333333 }));
+
+            // Table Body (Oval Shape)
+            const shape = new THREE.Shape();
+            shape.absarc(4, 0, 3, Math.PI/2, -Math.PI/2, true);
+            shape.absarc(-4, 0, 3, -Math.PI/2, Math.PI/2, true);
             
-            // The Spinning Part
-            const reel = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 1.5, 32), new THREE.MeshStandardMaterial({ color: 0xffffff }));
-            reel.rotation.z = Math.PI / 2;
-            reel.position.set(0, 2.5, 0.5);
-            group.add(body, reel);
-            group.position.set(10, 2, 0);
-            group.name = "slot_machine";
+            const extrudeSettings = { depth: 0.5, bevelEnabled: true, bevelThickness: 0.2, bevelSize: 0.2 };
+            const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+            
+            const material = new THREE.MeshStandardMaterial({ color: feltColor, roughness: 0.6 });
+            const tableTop = new THREE.Mesh(geometry, material);
+            tableTop.rotation.x = Math.PI / 2;
+            group.add(tableTop);
+
+            // The Rail (Leather Padded Edge)
+            const railMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.2 });
+            const rail = new THREE.Mesh(geometry, railMat);
+            rail.scale.set(1.05, 1.05, 1.2);
+            rail.position.y = 0.1;
+            rail.rotation.x = Math.PI / 2;
+            group.add(rail);
+
+            // The Dealer (3D Representation)
+            const dealerGeo = new THREE.CylinderGeometry(0.6, 0.6, 2, 32);
+            const dealerMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+            const dealer = new THREE.Mesh(dealerGeo, dealerMat);
+            dealer.position.set(0, 1.5, -2.5);
+            group.add(dealer);
+
+            // Table Label Light (Floating)
+            const textLight = new THREE.PointLight(feltColor, 2, 10);
+            textLight.position.set(0, 5, 0);
+            group.add(textLight);
+
+            group.position.set(x, 0, z);
             scene.add(group);
-            slotReels.push(reel);
+            return group;
         }
 
-        const table = createPokerTable();
-        createSlotMachine();
-        camera.position.set(0, 10, 20);
+        // Create the Room Layout
+        const t1 = createProfessionalTable(0, 0, "POKER 1", 0x076324);
+        const t2 = createProfessionalTable(15, 0, "POKER 2", 0x076324);
+        const t3 = createProfessionalTable(-15, 0, "BLACKJACK", 0x003366);
+        const t4 = createProfessionalTable(0, -15, "PRIVATE", 0x660000);
 
-        /** THE GAME ENGINES (Logic) **/
+        // Initial Camera Position
+        camera.position.set(0, 30, 40);
+        controls.target.set(0, 0, 0);
 
-        // POKER/BLACKJACK ENGINE
-        const pokerEngine = {
-            deck: [],
-            hand: [],
-            dealerScore: 0,
-            active: false,
+        /** GAMEPLAY & UI **/
+        function dealCards() {
+            const container = document.getElementById('player-hand');
+            container.innerHTML = '';
             
-            deal() {
-                if(balance < 100) return alert("Not enough cash!");
-                updateBalance(-100);
-                this.active = true;
-                this.hand = [this.draw(), this.draw()];
-                document.getElementById('hit-btn').disabled = false;
-                document.getElementById('stand-btn').disabled = false;
-                this.renderHand();
-                document.getElementById('dealer-msg').innerText = "Playing Poker...";
-            },
-            draw() {
-                const vals = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
-                return vals[Math.floor(Math.random() * vals.length)];
-            },
-            renderHand() {
-                const container = document.getElementById('player-hand');
-                container.innerHTML = '';
-                this.hand.forEach(card => {
-                    const div = document.createElement('div');
-                    div.className = 'playing-card';
-                    div.innerText = card;
-                    container.appendChild(div);
-                });
-            },
-            hit() {
-                this.hand.push(this.draw());
-                this.renderHand();
-                if(this.hand.length > 4) this.stand(); // Auto stand for demo
-            },
-            stand() {
-                const win = Math.random() > 0.5;
-                if(win) {
-                    updateBalance(300);
-                    document.getElementById('dealer-msg').innerText = "YOU WON $300!";
-                } else {
-                    document.getElementById('dealer-msg').innerText = "House Wins. Try Again.";
-                }
-                this.reset();
-            },
-            reset() {
-                document.getElementById('hit-btn').disabled = true;
-                document.getElementById('stand-btn').disabled = true;
-                this.active = false;
-            }
-        };
+            const deck = [
+                {v:'A', s:'♠', c:'black'}, {v:'K', s:'♥', c:'red'}, 
+                {v:'Q', s:'♦', c:'red'}, {v:'J', s:'♣', c:'black'},
+                {v:'10', s:'♠', c:'black'}
+            ];
 
-        // SLOT MACHINE ENGINE
-        const slotEngine = {
-            isSpinning: false,
-            spin() {
-                if(this.isSpinning || balance < 50) return;
-                updateBalance(-50);
-                this.isSpinning = true;
-                document.getElementById('dealer-msg').innerText = "Spinning...";
-                
-                let start = Date.now();
-                const timer = setInterval(() => {
-                    slotReels[0].rotation.x += 0.5;
-                    if(Date.now() - start > 2000) {
-                        clearInterval(timer);
-                        this.finish();
-                    }
-                }, 30);
-            },
-            finish() {
-                this.isSpinning = false;
-                const win = Math.random() > 0.8;
-                if(win) {
-                    updateBalance(1000);
-                    document.getElementById('dealer-msg').innerText = "JACKPOT! $1,000";
-                } else {
-                    document.getElementById('dealer-msg').innerText = "No luck. Spin again!";
-                }
+            // Deal 2 cards
+            for(let i=0; i<2; i++) {
+                const cardData = deck[Math.floor(Math.random()*deck.length)];
+                const card = document.createElement('div');
+                card.className = `playing-card ${cardData.c === 'red' ? 'suit-red' : ''}`;
+                card.innerHTML = `<div>${cardData.v}</div><div style="font-size:40px">${cardData.s}</div>`;
+                container.appendChild(card);
             }
-        };
-
-        /** INTERACTION LOGIC **/
-        function updateBalance(amt) {
-            balance += amt;
-            document.getElementById('balance').innerText = balance.toLocaleString();
+            
+            addChat("Dealer", "Bets are in. Good luck.");
         }
 
-        // ROOM TELEPORTATION
-        function gotoRoom(room) {
-            document.querySelectorAll('.game-hud').forEach(h => h.classList.remove('active-hud'));
-            if(room === 'poker') {
-                camera.position.set(-10, 6, 8);
-                controls.target.set(-10, 1, 0);
-                document.getElementById('poker-hud').classList.add('active-hud');
-                document.getElementById('dealer-msg').innerText = "Poker Table: Ready for Stakes";
+        function moveTo(target) {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('nav-active'));
+            // Visual Navigation
+            if(target === 'table1') {
+                gsap.to(camera.position, { x: 0, y: 8, z: 12, duration: 2 });
+                gsap.to(controls.target, { x: 0, y: 0, z: 0, duration: 2 });
+                document.getElementById('room-title').innerText = "VIP POKER TABLE 1";
+            } else if(target === 'table3') {
+                gsap.to(camera.position, { x: -15, y: 8, z: 12, duration: 2 });
+                gsap.to(controls.target, { x: -15, y: 0, z: 0, duration: 2 });
+                document.getElementById('room-title').innerText = "HIGH LIMIT BLACKJACK";
             } else {
-                camera.position.set(10, 5, 10);
-                controls.target.set(10, 2, 0);
-                document.getElementById('slots-hud').classList.add('active-hud');
-                document.getElementById('dealer-msg').innerText = "High Roller Slots: $50 per pull";
+                gsap.to(camera.position, { x: 0, y: 40, z: 50, duration: 2 });
+                gsap.to(controls.target, { x: 0, y: 0, z: 0, duration: 2 });
+                document.getElementById('room-title').innerText = "GRAND LOBBY";
             }
         }
 
-        // MIC PTT LOGIC
-        function startVoice() {
-            document.getElementById('ptt-button').classList.add('active');
-            // Here you would connect to a WebRTC signal for real multiplayer
-        }
-        function stopVoice() {
-            document.getElementById('ptt-button').classList.remove('active');
+        function addChat(name, msg) {
+            const win = document.getElementById('chat-window');
+            win.innerHTML += `<div class="msg"><span class="name">${name}:</span> ${msg}</div>`;
+            win.scrollTop = win.scrollHeight;
         }
 
-        // RENDER LOOP
+        // Simulate random players joining
+        setInterval(() => {
+            const users = ["Ace_Player", "EmpireKing", "Sasha99", "Lucky_Nikki"];
+            const quotes = ["Nice hand!", "Going all in next turn.", "This dealer is tough.", "I love this room."];
+            addChat(users[Math.floor(Math.random()*users.length)], quotes[Math.floor(Math.random()*quotes.length)]);
+        }, 8000);
+
+        function toggleMic(on) {
+            const btn = document.getElementById('ptt-btn');
+            if(on) {
+                btn.classList.add('active');
+                addChat("SYSTEM", "<i>Voice Transmitting...</i>");
+            } else {
+                btn.classList.remove('active');
+            }
+        }
+
         function animate() {
             requestAnimationFrame(animate);
             controls.update();
@@ -274,7 +269,6 @@
         }
         animate();
 
-        // RESIZE
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
