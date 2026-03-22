@@ -1,9 +1,9 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NIKKIFLIX EMPIRE | 2026 CASINO SUITE</title>
+    <title>NIKKIFLIX EMPIRE | 2026 CASINO SUITE V2</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -11,256 +11,267 @@
         :root { 
             --gold: #c5a059; 
             --red: #af0404; 
-            --glass: rgba(10, 10, 10, 0.95);
-            --border: 1px solid rgba(197, 160, 89, 0.4);
+            --glass: rgba(10, 10, 10, 0.9);
+            --border: 1px solid rgba(197, 160, 89, 0.5);
         }
-        body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        body { margin: 0; background: #050505; color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
 
         /* SIDEBAR NAVIGATION */
         #sidebar {
-            position: fixed; left: 0; top: 0; bottom: 0; width: 260px;
-            background: linear-gradient(180deg, #1a1a1a 0%, #000 100%);
-            border-right: var(--border); z-index: 1000; padding: 30px 15px;
-            display: flex; flex-direction: column; gap: 12px;
+            position: fixed; left: 0; top: 0; bottom: 0; width: 240px;
+            background: #000; border-right: var(--border); z-index: 1000; padding: 20px;
+            display: flex; flex-direction: column; gap: 10px;
         }
-        .nav-header { color: var(--gold); font-size: 10px; letter-spacing: 3px; margin-bottom: 20px; text-align: center; }
+        .nav-header { color: var(--gold); font-size: 12px; letter-spacing: 2px; margin-bottom: 20px; text-align: center; font-weight: bold; }
         .nav-item {
-            padding: 16px; border-radius: 4px; background: rgba(255,255,255,0.03);
-            color: #ddd; cursor: pointer; text-transform: uppercase;
-            font-size: 13px; font-weight: 600; transition: 0.3s;
-            border-left: 3px solid transparent;
+            padding: 12px; border-radius: 4px; background: rgba(255,255,255,0.05);
+            color: #bbb; cursor: pointer; text-transform: uppercase; font-size: 11px; transition: 0.3s;
         }
-        .nav-item:hover { background: rgba(197, 160, 89, 0.1); border-left: 3px solid var(--gold); color: var(--gold); }
-        .nav-active { background: rgba(197, 160, 89, 0.2); border-left: 3px solid var(--gold); color: var(--gold); }
+        .nav-item:hover, .nav-active { background: var(--gold); color: #000; font-weight: bold; }
 
-        /* CHAT & SOCIAL */
+        /* CHAT BOX */
         #social-panel {
-            position: fixed; right: 20px; bottom: 20px; width: 320px; height: 400px;
+            position: fixed; right: 20px; bottom: 20px; width: 300px; height: 350px;
             background: var(--glass); border: var(--border); border-radius: 8px;
             z-index: 1000; display: flex; flex-direction: column;
         }
-        #chat-window { flex: 1; padding: 15px; overflow-y: auto; font-size: 13px; }
-        .msg { margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px; }
-        .msg .name { color: var(--gold); font-weight: bold; margin-right: 5px; }
+        #chat-window { flex: 1; padding: 15px; overflow-y: auto; font-size: 12px; color: #ccc; }
+        .msg .name { color: var(--gold); font-weight: bold; }
 
-        /* HUD */
+        /* GAMEPLAY BUTTONS */
+        #game-controls {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            z-index: 1100; display: flex; flex-direction: column; align-items: center; gap: 15px;
+        }
+        .action-row { display: flex; gap: 10px; }
+        .btn-casino {
+            background: linear-gradient(180deg, #c5a059, #8e7037);
+            border: none; padding: 12px 25px; border-radius: 5px;
+            font-weight: bold; cursor: pointer; color: #000; min-width: 100px;
+        }
+        .btn-fold { background: #444; color: white; }
+        .btn-deal { background: #af0404; color: white; padding: 15px 40px; font-size: 1.2em; }
+
         #top-hud {
-            position: fixed; top: 0; left: 260px; right: 0; height: 80px;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 40px; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-            z-index: 900;
+            position: fixed; top: 20px; left: 260px; right: 40px;
+            display: flex; justify-content: space-between; align-items: center; z-index: 900;
         }
-        .balance-display {
-            background: #000; border: 1px solid var(--gold); padding: 10px 25px;
-            border-radius: 50px; color: var(--gold); font-size: 20px; font-weight: 800;
-            box-shadow: 0 0 15px rgba(197, 160, 89, 0.2);
-        }
-
-        /* CARD STYLING */
-        #game-ui {
-            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
-            z-index: 1000; display: flex; flex-direction: column; align-items: center;
-        }
-        .hand-container { display: flex; gap: 10px; margin-bottom: 20px; }
-        .playing-card {
-            width: 80px; height: 115px; background: #fff; border-radius: 8px;
-            color: #000; display: flex; flex-direction: column; align-items: center;
-            justify-content: center; font-size: 24px; font-weight: bold;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-        }
-        .suit-red { color: var(--red); }
-
-        .action-bar { display: flex; gap: 15px; align-items: center; }
-        .btn-play {
-            background: linear-gradient(to bottom, #c5a059, #8e7037);
-            border: none; padding: 18px 45px; border-radius: 4px;
-            font-weight: 900; cursor: pointer; color: #000; font-size: 16px;
-        }
-        #ptt-btn {
-            width: 60px; height: 60px; border-radius: 50%; background: #1a1a1a;
-            border: 2px solid var(--gold); cursor: pointer; display: flex;
-            align-items: center; justify-content: center; font-size: 24px;
-        }
-        #ptt-btn.active { background: var(--red); box-shadow: 0 0 20px var(--red); }
+        .balance { font-size: 24px; color: var(--gold); font-weight: bold; text-shadow: 0 0 10px rgba(197,160,89,0.5); }
     </style>
 </head>
 <body>
 
     <div id="sidebar">
-        <div class="nav-header">NIKKIFLIX EMPIRE OS</div>
-        <div class="nav-item nav-active" onclick="moveTo('lobby')">Casino Lobby</div>
-        <div class="nav-item" onclick="moveTo('table1')">VIP Poker Table 1</div>
-        <div class="nav-item" onclick="moveTo('table2')">VIP Poker Table 2</div>
-        <div class="nav-item" onclick="moveTo('table3')">Blackjack High Limit</div>
-        <div class="nav-item" onclick="moveTo('table4')">Private Friends Table</div>
-        <div class="nav-item" onclick="moveTo('slots')">Empire Slot Row</div>
+        <div class="nav-header">NIKKIFLIX EMPIRE</div>
+        <div class="nav-item nav-active" onclick="moveTo('lobby')">Lobby</div>
+        <div class="nav-item" onclick="moveTo('table1')">High Roller Poker</div>
+        <div class="nav-item" onclick="moveTo('table3')">Blackjack Table</div>
+        <div class="nav-item" onclick="moveTo('slots')">Slots Area</div>
     </div>
 
     <div id="top-hud">
-        <h2 id="room-title" style="letter-spacing: 2px; color: #fff;">GRAND LOBBY</h2>
-        <div class="balance-display">$<span id="bal-val">100,000</span></div>
+        <h1 id="room-name">GRAND CASINO LOBBY</h1>
+        <div class="balance">$<span id="bal-val">100,000</span></div>
     </div>
 
     <div id="social-panel">
-        <div style="padding: 10px; background: var(--gold); color: #000; font-weight: bold; font-size: 12px;">LIVE MULTIPLAYER CHAT</div>
-        <div id="chat-window">
-            <div class="msg"><span class="name">Dealer:</span> Welcome to the High Roller Suite.</div>
-        </div>
+        <div style="padding:10px; border-bottom: var(--border); font-size:10px; color:var(--gold);">LIVE TABLE CHAT</div>
+        <div id="chat-window"></div>
     </div>
 
-    <div id="game-ui">
-        <div class="hand-container" id="player-hand"></div>
-        <div class="action-bar">
-            <button class="btn-play" onclick="dealCards()">DEAL HAND</button>
-            <div id="ptt-btn" onmousedown="toggleMic(true)" onmouseup="toggleMic(false)">🎤</div>
+    <div id="game-controls">
+        <div class="action-row" id="betting-ui" style="display:none;">
+            <button class="btn-casino btn-fold" onclick="foldHand()">FOLD</button>
+            <button class="btn-casino" onclick="action('Call')">CALL</button>
+            <button class="btn-casino" onclick="action('Raise')">RAISE</button>
+        </div>
+        <div class="action-row">
+            <button class="btn-casino btn-deal" id="deal-btn" onclick="dealPhysicalCards()">DEAL HAND</button>
+            <div id="ptt-btn" style="background:#222; width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; border:1px solid var(--gold);">🎤</div>
         </div>
     </div>
 
     <script>
-        /** THREE.JS ENGINE - HIGH END GRAPHICS **/
+        /** SCENE SETUP **/
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x020202);
-        scene.fog = new THREE.FogExp2(0x020202, 0.015);
+        scene.background = new THREE.Color(0x050505);
+        scene.fog = new THREE.Fog(0x050505, 10, 50);
 
         const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.shadowMap.enabled = true;
         document.body.appendChild(renderer.domElement);
 
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
 
-        // Lighting System
-        const ambient = new THREE.AmbientLight(0xffffff, 0.3);
+        // Better Lighting
+        const ambient = new THREE.AmbientLight(0xffffff, 0.4);
         scene.add(ambient);
 
-        // Floor - Polished Black Marble
-        const floorGeo = new THREE.PlaneGeometry(200, 200);
-        const floorMat = new THREE.MeshStandardMaterial({ 
-            color: 0x080808, 
-            metalness: 0.9, 
-            roughness: 0.1 
-        });
-        const floor = new THREE.Mesh(floorGeo, floorMat);
+        const sun = new THREE.DirectionalLight(0xc5a059, 0.8);
+        sun.position.set(5, 10, 7);
+        scene.add(sun);
+
+        // Floor (Polished)
+        const floor = new THREE.Mesh(
+            new THREE.PlaneGeometry(100, 100),
+            new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.1, metalness: 0.5 })
+        );
         floor.rotation.x = -Math.PI / 2;
         scene.add(floor);
 
-        /** TABLE BUILDER FUNCTION **/
-        function createProfessionalTable(x, z, label, feltColor) {
-            const group = new THREE.Group();
-
-            // Table Body (Oval Shape)
-            const shape = new THREE.Shape();
-            shape.absarc(4, 0, 3, Math.PI/2, -Math.PI/2, true);
-            shape.absarc(-4, 0, 3, -Math.PI/2, Math.PI/2, true);
+        /** TABLE CONSTRUCTION **/
+        function createTable(x, z, color, name) {
+            const tableGroup = new THREE.Group();
             
-            const extrudeSettings = { depth: 0.5, bevelEnabled: true, bevelThickness: 0.2, bevelSize: 0.2 };
-            const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-            
-            const material = new THREE.MeshStandardMaterial({ color: feltColor, roughness: 0.6 });
-            const tableTop = new THREE.Mesh(geometry, material);
-            tableTop.rotation.x = Math.PI / 2;
-            group.add(tableTop);
+            // Table Top
+            const top = new THREE.Mesh(
+                new THREE.CylinderGeometry(5, 5, 0.5, 32),
+                new THREE.MeshStandardMaterial({ color: color, roughness: 0.8 })
+            );
+            tableGroup.add(top);
 
-            // The Rail (Leather Padded Edge)
-            const railMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.2 });
-            const rail = new THREE.Mesh(geometry, railMat);
-            rail.scale.set(1.05, 1.05, 1.2);
-            rail.position.y = 0.1;
-            rail.rotation.x = Math.PI / 2;
-            group.add(rail);
+            // The Rail
+            const rail = new THREE.Mesh(
+                new THREE.TorusGeometry(5, 0.3, 16, 100),
+                new THREE.MeshStandardMaterial({ color: 0x000000 })
+            );
+            rail.rotation.x = Math.PI/2;
+            rail.position.y = 0.3;
+            tableGroup.add(rail);
 
-            // The Dealer (3D Representation)
-            const dealerGeo = new THREE.CylinderGeometry(0.6, 0.6, 2, 32);
-            const dealerMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
-            const dealer = new THREE.Mesh(dealerGeo, dealerMat);
-            dealer.position.set(0, 1.5, -2.5);
-            group.add(dealer);
+            // Dealer Bust
+            const dealer = new THREE.Group();
+            const body = new THREE.Mesh(new THREE.BoxGeometry(1.5, 2, 0.8), new THREE.MeshStandardMaterial({color:0x111111}));
+            const head = new THREE.Mesh(new THREE.SphereGeometry(0.5), new THREE.MeshStandardMaterial({color:0xdbac98}));
+            head.position.y = 1.3;
+            dealer.add(body, head);
+            dealer.position.set(0, 1, -4);
+            tableGroup.add(dealer);
 
-            // Table Label Light (Floating)
-            const textLight = new THREE.PointLight(feltColor, 2, 10);
-            textLight.position.set(0, 5, 0);
-            group.add(textLight);
+            // Table Spotlight
+            const spot = new THREE.SpotLight(0xffffff, 1);
+            spot.position.set(0, 10, 0);
+            spot.target = top;
+            tableGroup.add(spot);
 
-            group.position.set(x, 0, z);
-            scene.add(group);
-            return group;
+            tableGroup.position.set(x, 0, z);
+            scene.add(tableGroup);
+            return tableGroup;
         }
 
-        // Create the Room Layout
-        const t1 = createProfessionalTable(0, 0, "POKER 1", 0x076324);
-        const t2 = createProfessionalTable(15, 0, "POKER 2", 0x076324);
-        const t3 = createProfessionalTable(-15, 0, "BLACKJACK", 0x003366);
-        const t4 = createProfessionalTable(0, -15, "PRIVATE", 0x660000);
+        const pokerTable = createTable(0, 0, 0x076324, "POKER");
+        const bjTable = createTable(15, 0, 0x003366, "BLACKJACK");
 
-        // Initial Camera Position
-        camera.position.set(0, 30, 40);
-        controls.target.set(0, 0, 0);
-
-        /** GAMEPLAY & UI **/
-        function dealCards() {
-            const container = document.getElementById('player-hand');
-            container.innerHTML = '';
+        /** PHYSICAL CARD SYSTEM **/
+        let myCards = [];
+        function create3DCard(val, suit, isRed) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128; canvas.height = 180;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = 'white'; ctx.fillRect(0,0,128,180);
+            ctx.fillStyle = isRed ? '#af0404' : 'black';
+            ctx.font = 'bold 40px Arial'; ctx.fillText(val, 10, 40);
+            ctx.font = '60px Arial'; ctx.fillText(suit, 35, 110);
             
-            const deck = [
-                {v:'A', s:'♠', c:'black'}, {v:'K', s:'♥', c:'red'}, 
-                {v:'Q', s:'♦', c:'red'}, {v:'J', s:'♣', c:'black'},
-                {v:'10', s:'♠', c:'black'}
+            const tex = new THREE.CanvasTexture(canvas);
+            const cardGeo = new THREE.BoxGeometry(0.7, 0.01, 1);
+            const cardMat = [
+                new THREE.MeshStandardMaterial({color:0xcccccc}), // sides
+                new THREE.MeshStandardMaterial({color:0xcccccc}), 
+                new THREE.MeshStandardMaterial({map: tex}),      // top
+                new THREE.MeshStandardMaterial({color:0xaf0404}), // back
+                new THREE.MeshStandardMaterial({color:0xcccccc}),
+                new THREE.MeshStandardMaterial({color:0xcccccc})
+            ];
+            return new THREE.Mesh(cardGeo, cardMat);
+        }
+
+        function dealPhysicalCards() {
+            // Hide Deal Button, Show Actions
+            document.getElementById('deal-btn').style.display = 'none';
+            document.getElementById('betting-ui').style.display = 'flex';
+
+            // Clear old cards
+            myCards.forEach(c => scene.remove(c));
+            myCards = [];
+
+            const cardData = [
+                {v:'A', s:'♠', r:false},
+                {v:'K', s:'♦', r:true}
             ];
 
-            // Deal 2 cards
-            for(let i=0; i<2; i++) {
-                const cardData = deck[Math.floor(Math.random()*deck.length)];
-                const card = document.createElement('div');
-                card.className = `playing-card ${cardData.c === 'red' ? 'suit-red' : ''}`;
-                card.innerHTML = `<div>${cardData.v}</div><div style="font-size:40px">${cardData.s}</div>`;
-                container.appendChild(card);
-            }
-            
-            addChat("Dealer", "Bets are in. Good luck.");
+            cardData.forEach((data, i) => {
+                const card = create3DCard(data.v, data.s, data.r);
+                card.position.set(0, 0.5, -3); // Start at dealer
+                scene.add(card);
+                myCards.push(card);
+
+                // Slide Animation
+                gsap.to(card.position, {
+                    x: -0.5 + (i * 1.2),
+                    y: 0.4,
+                    z: 3,
+                    duration: 0.8,
+                    delay: i * 0.2,
+                    ease: "power2.out"
+                });
+                
+                // Flip Animation
+                card.rotation.x = Math.PI; // Face down
+                gsap.to(card.rotation, {
+                    x: 0,
+                    duration: 0.5,
+                    delay: 0.5 + (i * 0.2)
+                });
+            });
+
+            addChat("Dealer", "Cards dealt. Your action?");
         }
 
-        function moveTo(target) {
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('nav-active'));
-            // Visual Navigation
-            if(target === 'table1') {
-                gsap.to(camera.position, { x: 0, y: 8, z: 12, duration: 2 });
+        function foldHand() {
+            myCards.forEach((card, i) => {
+                gsap.to(card.position, {
+                    x: 0, z: -1, y: 0.4, duration: 0.5
+                });
+                gsap.to(card.material[2], { opacity: 0, duration: 0.5 });
+            });
+            setTimeout(() => {
+                document.getElementById('deal-btn').style.display = 'block';
+                document.getElementById('betting-ui').style.display = 'none';
+            }, 600);
+            addChat("You", "Fold.");
+        }
+
+        function action(type) {
+            addChat("You", type + ".");
+            // Logic for betting would go here
+        }
+
+        /** CAMERA NAVIGATION **/
+        function moveTo(loc) {
+            if(loc === 'table1') {
+                gsap.to(camera.position, { x: 0, y: 6, z: 8, duration: 2 });
                 gsap.to(controls.target, { x: 0, y: 0, z: 0, duration: 2 });
-                document.getElementById('room-title').innerText = "VIP POKER TABLE 1";
-            } else if(target === 'table3') {
-                gsap.to(camera.position, { x: -15, y: 8, z: 12, duration: 2 });
-                gsap.to(controls.target, { x: -15, y: 0, z: 0, duration: 2 });
-                document.getElementById('room-title').innerText = "HIGH LIMIT BLACKJACK";
-            } else {
-                gsap.to(camera.position, { x: 0, y: 40, z: 50, duration: 2 });
+                document.getElementById('room-name').innerText = "HIGH ROLLER POKER";
+            } else if(loc === 'lobby') {
+                gsap.to(camera.position, { x: 10, y: 20, z: 25, duration: 2 });
                 gsap.to(controls.target, { x: 0, y: 0, z: 0, duration: 2 });
-                document.getElementById('room-title').innerText = "GRAND LOBBY";
+                document.getElementById('room-name').innerText = "GRAND CASINO LOBBY";
             }
         }
 
-        function addChat(name, msg) {
+        function addChat(user, msg) {
             const win = document.getElementById('chat-window');
-            win.innerHTML += `<div class="msg"><span class="name">${name}:</span> ${msg}</div>`;
+            win.innerHTML += `<div class="msg"><span class="name">${user}:</span> ${msg}</div>`;
             win.scrollTop = win.scrollHeight;
         }
 
-        // Simulate random players joining
-        setInterval(() => {
-            const users = ["Ace_Player", "EmpireKing", "Sasha99", "Lucky_Nikki"];
-            const quotes = ["Nice hand!", "Going all in next turn.", "This dealer is tough.", "I love this room."];
-            addChat(users[Math.floor(Math.random()*users.length)], quotes[Math.floor(Math.random()*quotes.length)]);
-        }, 8000);
-
-        function toggleMic(on) {
-            const btn = document.getElementById('ptt-btn');
-            if(on) {
-                btn.classList.add('active');
-                addChat("SYSTEM", "<i>Voice Transmitting...</i>");
-            } else {
-                btn.classList.remove('active');
-            }
-        }
+        // Initial View
+        camera.position.set(10, 20, 25);
+        addChat("System", "Welcome back, Nikki.");
 
         function animate() {
             requestAnimationFrame(animate);
@@ -277,3 +288,4 @@
     </script>
 </body>
 </html>
+ 
