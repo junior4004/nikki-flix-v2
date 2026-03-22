@@ -1,172 +1,119 @@
- 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NIKKIFLIX EMPIRE | COMPLETE 2026 EDITION</title>
+    <title>NIKKIFLIX EMPIRE | MASTER CASINO 2026</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
-        :root { --gold: #c5a059; --emerald: #008f39; --green-gold: linear-gradient(135deg, #008f39 0%, #c5a059 100%); }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        :root { --gold: #ffcc00; --neon-purple: #a855f7; --neon-blue: #3b82f6; --neon-red: #ef4444; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #050505; color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
 
-        #lobby { position: absolute; inset: 0; background: radial-gradient(circle, #1a1a1a, #000); padding: 80px 40px; z-index: 1000; overflow-y: auto; }
-        .nav-bar { position: fixed; top: 70px; left: 0; right: 0; background: rgba(0,0,0,0.8); padding: 10px 40px; z-index: 2100; display: flex; gap: 20px; border-bottom: 1px solid var(--emerald); }
-        .nav-btn { color: #fff; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 12px; padding: 5px 15px; border-radius: 4px; border: 1px solid transparent; transition: 0.3s; }
-        .nav-btn:hover { border-color: var(--gold); background: rgba(197, 160, 89, 0.1); }
-
+        /* LOBBY GRID (NETFLIX STYLE) */
+        #lobby { position: absolute; width: 100%; height: 100%; background: radial-gradient(circle, #1a1a1a, #000); padding: 40px; box-sizing: border-box; z-index: 1000; overflow-y: auto; }
         .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; margin-top: 20px; }
         .tile { aspect-ratio: 16/9; background: #111; border: 2px solid #333; border-radius: 15px; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; }
-        .tile:hover { transform: scale(1.05); border-color: var(--gold); box-shadow: 0 0 20px rgba(197,160,89,0.3); }
-        .tile-label { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.85); padding: 12px; font-weight: bold; color: var(--gold); text-align: center; }
+        .tile:hover { transform: scale(1.05); border-color: var(--gold); box-shadow: 0 0 20px rgba(255, 204, 0, 0.4); }
+        .tile-label { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.85); padding: 12px; font-weight: bold; color: var(--gold); font-size: 14px; text-align: center; }
 
-        #ad-gate { position: fixed; inset: 0; background: #000; z-index: 5000; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        #ad-bar-container { width: 400px; height: 10px; background: #222; margin-top: 20px; border-radius: 5px; overflow: hidden; }
-        #ad-progress { width: 0%; height: 100%; background: var(--emerald); }
+        /* HUD */
+        #top-hud { position: fixed; top: 0; left: 0; right: 0; height: 70px; background: rgba(0,0,0,0.9); border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; z-index: 2000; }
+        .balance-box { color: var(--gold); font-size: 24px; font-weight: 900; text-shadow: 0 0 10px rgba(255,204,0,0.5); }
 
-        #top-hud { position: fixed; top: 0; left: 0; right: 0; height: 70px; background: #000; border-bottom: 2px solid var(--gold); display: flex; justify-content: space-between; align-items: center; padding: 0 40px; z-index: 2000; }
-        .balance-box { background: var(--green-gold); color: #000; padding: 10px 25px; border-radius: 50px; font-weight: 900; font-size: 20px; }
-
-        .screen { position: absolute; inset: 0; display: none; z-index: 500; }
+        /* SCREENS */
+        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 500; }
         .active-screen { display: block; }
-        #exit-btn { position: absolute; top: 120px; left: 40px; background: #222; padding: 10px 20px; border-radius: 5px; cursor: pointer; z-index: 3000; border: 1px solid var(--gold); font-weight: bold; }
+
+        /* POKER UI */
+        #poker-controls { position: absolute; left: 40px; bottom: 120px; display: flex; flex-direction: column; gap: 15px; pointer-events: auto; }
+        .pill-btn { background: linear-gradient(180deg, #1e40af, #1e3a8a); border: 2px solid #3b82f6; padding: 18px 50px; border-radius: 50px; color: white; font-weight: 800; cursor: pointer; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .pill-btn:hover { background: #3b82f6; transform: translateY(-2px); }
+        .seat-tag { position: absolute; background: rgba(0,0,0,0.9); border: 1px solid var(--gold); padding: 6px 15px; border-radius: 20px; font-size: 12px; transform: translate(-50%, -50%); cursor: pointer; transition: 0.2s; pointer-events: auto; }
+        .seat-tag:hover { background: var(--gold); color: black; }
+
+        /* SLOTS UI */
+        .slots-room { background: linear-gradient(to bottom, #0f2d1a 0%, #1a472a 100%); display: flex; flex-direction: column; align-items: center; padding-top: 100px; }
+        .pots-row { display: flex; gap: 40px; margin-bottom: 30px; }
+        .pot { width: 100px; height: 100px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .reel-grid { display: grid; grid-template-columns: repeat(5, 110px); gap: 12px; background: rgba(0,0,0,0.8); padding: 20px; border: 4px solid var(--gold); border-radius: 15px; }
+        .reel-col { height: 330px; background: #fff; border-radius: 8px; overflow: hidden; position: relative; }
+        .slot-sym { height: 110px; display: flex; align-items: center; justify-content: center; font-size: 60px; color: #000; }
+        .spin-btn { width: 110px; height: 110px; background: radial-gradient(#ff0000, #800000); border: 5px solid #fff; border-radius: 50%; color: #fff; font-weight: 900; cursor: pointer; margin-top: 40px; box-shadow: 0 0 25px rgba(255,0,0,0.5); }
+
+        #exit-btn { position: absolute; top: 100px; left: 40px; background: #222; padding: 12px 25px; border-radius: 8px; cursor: pointer; z-index: 3000; font-weight: bold; border: 1px solid #444; }
     </style>
 </head>
 <body>
 
-    <div id="ad-gate">
-        <h1 style="color:var(--gold)">NIKKIFLIX SPONSOR SPOTLIGHT</h1>
-        <p id="ad-status">Loading Premium Experience...</p>
-        <div id="ad-timer" style="font-size: 60px; font-weight: 900; color: var(--emerald);">30</div>
-        <div id="ad-bar-container"><div id="ad-progress"></div></div>
-    </div>
-
     <div id="top-hud">
-        <div style="font-weight: 900; color: var(--gold); font-size: 22px; letter-spacing: 2px;">NIKKIFLIX EMPIRE</div>
-        <div class="balance-box">$<span id="bal-val">100,000</span></div>
+        <div style="letter-spacing: 3px; font-weight: 900; color: var(--gold); font-size: 20px;">NIKKIFLIX EMPIRE</div>
+        <div class="balance-box">$<span id="bal-display">100,000</span></div>
     </div>
 
-    <div class="nav-bar">
-        <div class="nav-btn" onclick="showCategory('all')">All Games</div>
-        <div class="nav-btn" onclick="showCategory('movies')">Nikkiflix Theater</div>
-        <div class="nav-btn" onclick="showCategory('social')">Social Club</div>
-        <div class="nav-btn" style="color:#ff0055" onclick="showCategory('adult')">🔞 After Dark</div>
-    </div>
-
+    <!-- LOBBY -->
     <div id="lobby" class="active-screen">
-        <h2 id="lobby-title" style="color:var(--gold); border-bottom: 1px solid #333; padding-bottom: 10px;">GRAND CASINO FLOOR</h2>
-        <div class="game-grid" id="main-grid">
+        <h2 style="margin-top: 60px; color: var(--gold); border-bottom: 2px solid #333; padding-bottom: 10px;">CASINO FLOOR</h2>
+        <div class="game-grid">
             <div class="tile" onclick="launch('poker')">
-                <div style="height:100%; background: linear-gradient(45deg, #076324, #000); display:flex; align-items:center; justify-content:center; font-size:60px;">🃏</div>
-                <div class="tile-label">VIP TEXAS HOLD'EM (NICOLE)</div>
+                <div style="height:100%; background: linear-gradient(45deg, #076324, #000); display:flex; align-items:center; justify-content:center; font-size:80px;">🃏</div>
+                <div class="tile-label">PRO TEXAS HOLD'EM (LIVE)</div>
             </div>
             <div class="tile" onclick="launch('slots')">
-                <div style="height:100%; background: linear-gradient(45deg, #4c1d95, #000); display:flex; align-items:center; justify-content:center; font-size:60px;">🎰</div>
-                <div class="tile-label">EMPIRE SLOTS (PROMISE)</div>
-            </div>
-            <div class="tile" onclick="launch('social')">
-                <div style="height:100%; background: linear-gradient(45deg, #1e40af, #000); display:flex; align-items:center; justify-content:center; font-size:60px;">🎲</div>
-                <div class="tile-label">SOCIAL ROOM (SPADES & DOMINOES)</div>
+                <div style="height:100%; background: linear-gradient(45deg, #4c1d95, #000); display:flex; align-items:center; justify-content:center; font-size:80px;">🎰</div>
+                <div class="tile-label">POWER CHANCE: CLOVER LUCK</div>
             </div>
         </div>
     </div>
 
+    <!-- POKER SCREEN -->
     <div id="poker-screen" class="screen">
-        <div id="exit-btn" onclick="goHome()">← EXIT TO LOBBY</div>
-        <div style="position:absolute; bottom:40px; width:100%; text-align:center;">
-             <button style="padding:15px 40px; background:red; border-radius:50px; font-weight:900; color:white; cursor:pointer; border: 3px solid white;" onclick="deal()">DEAL HAND</button>
+        <div id="exit-btn" onclick="backToLobby()">← LEAVE TABLE</div>
+        <div id="poker-controls" style="display:none;">
+            <div class="pill-btn" onclick="foldHand()">FOLD</div>
+            <div class="pill-btn" onclick="pokerAction('CHECK')">CHECK</div>
+            <div class="pill-btn" onclick="pokerAction('ALL-IN')">ALL-IN</div>
         </div>
+        <button id="deal-trigger" style="position:absolute; bottom:40px; left:50%; transform:translateX(-50%); padding:20px 60px; border-radius:50px; background:red; color:white; font-weight:900; cursor:pointer; border:4px solid #fff;" onclick="startPhysicalDeal()">DEAL HAND</button>
+        <div id="seat-tags"></div>
+    </div>
+
+    <!-- SLOTS SCREEN -->
+    <div id="slots-screen" class="screen slots-room">
+        <div id="exit-btn" onclick="backToLobby()">← LEAVE SLOTS</div>
+        <div class="pots-row">
+            <div class="pot" style="background:var(--neon-purple); box-shadow:0 0 20px var(--neon-purple);">MULTI</div>
+            <div class="pot" style="background:var(--neon-blue); box-shadow:0 0 20px var(--neon-blue); width:130px; height:130px;">COLLECT</div>
+            <div class="pot" style="background:var(--neon-red); box-shadow:0 0 20px var(--neon-red);">MYSTERY</div>
+        </div>
+        <div class="reel-grid">
+            <div class="reel-col" id="reel0"></div>
+            <div class="reel-col" id="reel1"></div>
+            <div class="reel-col" id="reel2"></div>
+            <div class="reel-col" id="reel3"></div>
+            <div class="reel-col" id="reel4"></div>
+        </div>
+        <button class="spin-btn" onclick="spinSlots()">SPIN<br><span style="font-size:12px;">($500)</span></button>
     </div>
 
     <script>
+        /** REAL ODDS MATH **/
         let balance = 100000;
-        
-        function speak(avatar, text) {
-            const utter = new SpeechSynthesisUtterance(text);
-            utter.rate = 0.95;
-            window.speechSynthesis.speak(utter);
+        const slotSymbols = ["J","J","J","Q","Q","Q","K","K","🍺","🧲","💰","🍀"]; // J is common, Clover is rare
+        const suits = ['♠','♥','♦','♣'];
+        const values = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+
+        function updateUI() {
+            document.getElementById('bal-display').innerText = balance.toLocaleString();
         }
 
-        function launch(room) {
-            document.getElementById('lobby').classList.remove('active-screen');
-            document.getElementById('poker-screen').classList.add('active-screen');
-            
-            if(room === 'poker') speak("Nicole", "Welcome to the VIP Poker Suite. I am Nicole. Good luck tonight.");
-            if(room === 'slots') speak("Promise", "Promise here! Try your luck on the Empire Slots. High stakes, high rewards.");
-            if(room === 'social') speak("Nicole", "Welcome to the Social Club. The Spades and Dominoes tables are currently open.");
-        }
-
-        function goHome() {
-            document.getElementById('poker-screen').classList.remove('active-screen');
-            document.getElementById('lobby').classList.add('active-screen');
-        }
-
-        function showCategory(cat) {
-            const grid = document.getElementById('main-grid');
-            const title = document.getElementById('lobby-title');
-            grid.innerHTML = ""; 
-
-            if(cat === 'movies' || cat === 'adult') {
-                title.innerText = cat === 'movies' ? "NIKKIFLIX PREMIER THEATER" : "🔞 AFTER DARK SUITE";
-                const movies = cat === 'movies' ? ["Empire Origins", "Casino Royale", "The Promised Land"] : ["VIP Private 1", "Exclusive Access 2"];
-                
-                movies.forEach(m => {
-                    const tile = document.createElement('div');
-                    tile.className = "tile";
-                    tile.innerHTML = `<div style="height:100%; background:#111; display:flex; align-items:center; justify-content:center; font-size:50px;">🎬</div><div class="tile-label">${m} (WATCH NOW)</div>`;
-                    tile.onclick = () => triggerAd(m);
-                    grid.appendChild(tile);
-                });
-                speak("Nicole", `Accessing ${cat}. Please wait for the mandatory sponsorship countdown.`);
-            } else {
-                location.reload();
-            }
-        }
-
-        function triggerAd(movieName) {
-            const gate = document.getElementById('ad-gate');
-            const bar = document.getElementById('ad-progress');
-            const timer = document.getElementById('ad-timer');
-            gate.style.display = 'flex';
-            
-            let count = 30;
-            const interval = setInterval(() => {
-                count--;
-                timer.innerText = count;
-                bar.style.width = ((30 - count) / 30 * 100) + "%";
-                if(count <= 0) {
-                    clearInterval(interval);
-                    gate.style.display = 'none';
-                    alert("Sponsorship verified. Playing: " + movieName);
-                }
-            }, 1000);
-        }
-
+        /** THREE.JS ENGINE (POKER) **/
         const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x050505);
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.getElementById('poker-screen').appendChild(renderer.domElement);
-        
-        scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-        const floor = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshStandardMaterial({color:0x050505, metalness:0.9, roughness:0.05}));
-        floor.rotation.x = -Math.PI/2;
-        scene.add(floor);
 
-        const table = new THREE.Mesh(new THREE.CylinderGeometry(5, 5, 0.5, 32), new THREE.MeshStandardMaterial({color:0x004400}));
-        table.position.y = 0.25;
-        scene.add(table);
-
-        camera.position.set(0, 15, 25);
-        camera.lookAt(0,0,0);
-
-        function animate() { requestAnimationFrame(animate); renderer.render(scene, camera); }
-        animate();
-
-        window.onload = () => {
-            setTimeout(() => speak("Promise", "Welcome to Nikkiflix Empire. Select a destination from the lobby or use the navigation bar to find your favorite movie."), 1000);
-        };
-    </script>
-</body>
-</html>
+        // Professional Lighting
+        const 
