@@ -1,417 +1,285 @@
- 
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NikkiFlix Luxury Virtual World 2026</title>
+    <title>NIKKIFLIX EMPIRE | THE OPERATING BUILD</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
-        :root {
-            --gold: #ffcc00;
-            --red: #e50914;
-            --glass: rgba(255, 255, 255, 0.05);
-            --border: rgba(255, 255, 255, 0.1);
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            background: #000;
-            color: white;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* AD OVERLAY */
-        #ad-layer {
-            position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 10000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* MAIN TOP BAR */
-        header {
-            height: 70px;
-            background: rgba(10,10,10,0.95);
-            border-bottom: 2px solid var(--gold);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 30px;
-            position: fixed;
-            width: 100%;
-            z-index: 100;
-        }
-
-        .stats { display: flex; gap: 25px; font-weight: bold; font-size: 18px; }
-        .gold-txt { color: var(--gold); }
-
-        /* NAVIGATION */
-        .main-layout {
-            display: grid;
-            grid-template-columns: 260px 1fr 320px;
-            height: 100vh;
-            padding-top: 70px;
-        }
-
-        nav {
-            background: #0a0a0a;
-            border-right: 1px solid var(--border);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .nav-item {
-            padding: 18px;
-            background: var(--glass);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: 0.3s;
-            border: 1px solid transparent;
-            text-align: center;
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
-
-        .nav-item:hover {
-            background: var(--red);
-            border-color: white;
-            transform: translateX(5px);
-        }
-
-        /* VIEWPORT */
-        #viewport {
-            position: relative;
-            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
-            overflow-y: auto;
-            padding: 40px;
-        }
-
-        .view-section { display: none; width: 100%; }
-        .active-view { display: block; animation: fadeIn 0.5s ease; }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* SLOTS ENGINE */
-        .slot-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
-            justify-content: center;
-        }
-
-        .machine {
-            width: 280px;
-            background: linear-gradient(145deg, #222, #111);
-            border: 3px solid #444;
-            border-radius: 20px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-        }
-
-        .machine.high-stakes { border-color: var(--gold); }
-        .denom { background: var(--gold); color: #000; padding: 4px 12px; border-radius: 5px; font-weight: 800; margin-bottom: 15px; display: inline-block; }
+        :root { --gold: #d4af37; --red: #e50914; --glass: rgba(0,0,0,0.8); }
+        body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         
-        .reels {
-            background: #000;
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            border-radius: 10px;
-            margin: 15px 0;
-            border: 2px solid #333;
-        }
-
-        /* POKER TABLE */
-        .poker-arena {
-            background: #074e20;
-            width: 100%;
-            height: 450px;
-            border-radius: 225px;
-            border: 12px solid #3d2613;
-            position: relative;
-            box-shadow: inset 0 0 100px #000;
-            margin-top: 20px;
-        }
-
-        .playing-card {
-            width: 70px;
-            height: 100px;
-            background: white;
-            color: black;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 24px;
-            position: absolute;
-            box-shadow: 3px 3px 10px rgba(0,0,0,0.6);
-        }
-
-        /* THEATER */
-        .cinema-screen {
-            width: 100%;
-            background: #000;
-            aspect-ratio: 16/9;
-            border: 8px solid #111;
-            box-shadow: 0 0 50px rgba(229, 9, 20, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* AVATAR & CAMERA */
-        .user-hub {
-            margin-top: auto;
-            padding-top: 20px;
-            border-top: 1px solid var(--border);
-            text-align: center;
-        }
-
-        .av-circle {
-            width: 110px;
-            height: 110px;
-            border-radius: 50%;
-            border: 3px solid var(--gold);
-            margin: 0 auto 15px;
-            background: #222;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 50px;
-        }
-
-        /* CHAT */
-        .sidebar-chat {
-            background: #0a0a0a;
-            border-left: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-        }
-
-        #chat-window {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            font-size: 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .bot-msg { color: #aaa; }
-        .bot-msg b { color: var(--gold); }
+        /* UI OVERLAYS */
+        #gui-layer { position: fixed; inset: 0; pointer-events: none; z-index: 100; }
+        .pointer-events { pointer-events: auto; }
         
-        .chat-input {
-            padding: 20px;
-            background: #111;
-            border: none;
-            color: #fff;
-            outline: none;
-            border-top: 1px solid var(--border);
+        header { 
+            height: 60px; background: linear-gradient(to bottom, #000, transparent);
+            display: flex; justify-content: space-between; align-items: center; padding: 0 30px;
         }
 
-        button {
-            padding: 12px 24px;
-            background: var(--red);
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            text-transform: uppercase;
+        .balance-card { 
+            background: var(--glass); padding: 10px 20px; border-radius: 30px; 
+            border: 1px solid var(--gold); color: var(--gold); font-weight: 900;
         }
 
-        button:active { transform: scale(0.95); }
+        /* GAME HUDs */
+        .game-hud { 
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            display: none; flex-direction: column; align-items: center; gap: 15px;
+        }
+        .active-hud { display: flex; }
+
+        .btn { 
+            background: var(--gold); color: #000; border: none; padding: 15px 30px; 
+            border-radius: 5px; font-weight: bold; cursor: pointer; text-transform: uppercase;
+        }
+        .btn:disabled { background: #444; color: #888; }
+
+        /* PTT STYLING */
+        #ptt-button {
+            width: 70px; height: 70px; border-radius: 50%; background: #222;
+            border: 3px solid var(--gold); pointer-events: auto; display: flex;
+            align-items: center; justify-content: center; font-size: 24px;
+            transition: 0.2s; cursor: pointer;
+        }
+        #ptt-button.active { background: var(--red); transform: scale(1.1); box-shadow: 0 0 20px var(--red); }
+
+        /* NOTIFICATION */
+        #dealer-msg {
+            position: absolute; top: 100px; width: 100%; text-align: center;
+            font-size: 24px; color: var(--gold); font-weight: bold; text-shadow: 0 0 10px #000;
+        }
+
+        /* CARD STYLING */
+        .card-container { display: flex; gap: 10px; margin-bottom: 20px; }
+        .playing-card { 
+            width: 60px; height: 90px; background: white; color: black; 
+            border-radius: 5px; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 20px; border: 2px solid #ccc;
+        }
     </style>
 </head>
 <body>
 
-    <div id="ad-layer">
-        <h1 style="letter-spacing: 5px; color: var(--gold);">NIKKIFLIX PREMIUM</h1>
-        <div style="width: 640px; height: 360px; background: #111; margin: 30px; display: flex; align-items: center; justify-content: center; border: 1px solid #333;">
-            <p style="font-size: 20px; color: #666;">[Live 2026 Commercial Feed]</p>
-        </div>
-        <button onclick="unlockApp()" style="font-size: 20px; padding: 20px 50px;">Skip Ad & Enter World</button>
-    </div>
+    <div id="gui-layer">
+        <header class="pointer-events">
+            <h1 style="color: var(--red); font-style: italic; letter-spacing: 2px;">NIKKIFLIX EMPIRE</h1>
+            <div class="balance-card">BANK: $<span id="balance">10,000</span></div>
+        </header>
 
-    <header>
-        <h1 style="color: var(--red); letter-spacing: 2px;">NIKKIFLIX</h1>
-        <div class="stats">
-            <span class="gold-txt">GOLD: <span id="g-count">10,000</span></span>
-            <span style="color: #00d4ff;">SWEEP: 500</span>
-        </div>
-    </header>
+        <div id="dealer-msg">WALK UP TO A TABLE OR SLOT MACHINE TO PLAY</div>
 
-    <div class="main-layout">
-        <nav>
-            <div class="nav-item" onclick="show('view-slots')">🎰 CASINO SLOTS</div>
-            <div class="nav-item" onclick="show('view-poker')">🃏 POKER ROOM</div>
-            <div class="nav-item" onclick="show('view-social')">🎴 SOCIAL CARDS</div>
-            <div class="nav-item" onclick="show('view-theater')">🎬 THEATER</div>
-            <div class="nav-item" onclick="show('view-adult')">🔞 ADULT LOUNGE</div>
-            
-            <div class="user-hub">
-                <div class="av-circle" id="user-av">👤</div>
-                <button onclick="initCam()" style="font-size: 11px; background: #333;">Toggle Face Cam</button>
-                <div style="margin-top: 10px; font-weight: bold;">NICOLE</div>
+        <!-- POKER HUD -->
+        <div id="poker-hud" class="game-hud pointer-events">
+            <div class="card-container" id="player-hand"></div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn" onclick="pokerEngine.deal()">Deal Hand ($100)</button>
+                <button class="btn" onclick="pokerEngine.hit()" id="hit-btn" disabled>Hit</button>
+                <button class="btn" onclick="pokerEngine.stand()" id="stand-btn" disabled>Stand</button>
+                <div id="ptt-button" onmousedown="startVoice()" onmouseup="stopVoice()">🎤</div>
             </div>
+        </div>
+
+        <!-- SLOTS HUD -->
+        <div id="slots-hud" class="game-hud pointer-events">
+            <button class="btn" style="padding: 25px 60px; font-size: 20px;" onclick="slotEngine.spin()">SPIN REELS ($50)</button>
+        </div>
+        
+        <!-- ROOM SWITCHER -->
+        <nav style="position: absolute; left: 20px; top: 100px;" class="pointer-events">
+            <button class="btn" onclick="gotoRoom('casino')" style="display: block; margin-bottom: 10px; width: 150px;">Casino</button>
+            <button class="btn" onclick="gotoRoom('poker')" style="display: block; width: 150px;">Poker Room</button>
         </nav>
-
-        <main id="viewport">
-            <div id="view-slots" class="view-section active-view">
-                <div class="slot-row">
-                    <div class="machine">
-                        <div class="denom">$0.01 MACHINE</div>
-                        <div class="reels" id="r1">🍒 | 🍒 | 🍒</div>
-                        <button onclick="playSlot('r1', 1)">SPIN PENNY</button>
-                    </div>
-                    <div class="machine">
-                        <div class="denom">$0.25 MACHINE</div>
-                        <div class="reels" id="r2">💎 | 💎 | 💎</div>
-                        <button onclick="playSlot('r2', 25)">SPIN QUARTER</button>
-                    </div>
-                    <div class="machine high-stakes">
-                        <div class="denom">$10.00 MACHINE</div>
-                        <div class="reels" id="r3">🎰 | 🎰 | 🎰</div>
-                        <button onclick="playSlot('r3', 1000)">SPIN $10</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-poker" class="view-section">
-                <h2 style="text-align:center; color:var(--gold);">LIVE TEXAS HOLD'EM</h2>
-                <div class="poker-arena" id="poker-deck"></div>
-                <div style="text-align: center; margin-top: 30px; display: flex; justify-content: center; gap: 15px;">
-                    <button onclick="deal()">DEAL CARDS</button>
-                    <button onclick="vocal('All in, let\'s see them.')" style="background: #555;">TALK: ALL IN</button>
-                </div>
-            </div>
-
-            <div id="view-theater" class="view-section">
-                <div class="cinema-screen">
-                    <video id="vid" width="100%" controls>
-                        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-                    </video>
-                </div>
-                <h2 style="margin-top: 20px;">Now Streaming: World Series Highlights</h2>
-            </div>
-
-            <div id="view-adult" class="view-section">
-                <div style="border: 2px solid pink; padding: 50px; border-radius: 20px; text-align: center;">
-                    <h1 style="color: pink; margin-bottom: 20px;">PRIVATE ADULT INTERACTIVE</h1>
-                    <p>Live Real-Time Room Connected. Waiting for user interaction...</p>
-                </div>
-            </div>
-
-            <div id="view-social" class="view-section">
-                <h2>SOCIAL CARD LOUNGE</h2>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
-                    <div style="background: var(--glass); padding: 30px; border-radius: 15px;">Bingo Hall - Active</div>
-                    <div style="background: var(--glass); padding: 30px; border-radius: 15px;">Keno Lounge - Active</div>
-                </div>
-            </div>
-        </main>
-
-        <aside class="sidebar-chat">
-            <div style="padding: 15px; background: #111; font-weight: bold; color: var(--gold); border-bottom: 1px solid var(--border);">WORLD CHAT</div>
-            <div id="chat-window"></div>
-            <input type="text" class="chat-input" placeholder="Type to chat..." onkeydown="if(event.key==='Enter'){ postChat(this.value, 'Nicole'); this.value=''; }">
-        </aside>
     </div>
 
     <script>
-        let gold = 10000;
-        const chat = document.getElementById('chat-window');
-        const items = ['🍒', '💎', '7️⃣', '🎰', '🍋', '🔔'];
+        /** ENGINE SETTINGS **/
+        let balance = 10000;
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-        function unlockApp() {
-            document.getElementById('ad-layer').style.display = 'none';
-            vocal("System Online. Welcome Nicole.");
-            setInterval(autoBot, 4500);
+        // Lights
+        const ambient = new THREE.AmbientLight(0x404040, 2);
+        scene.add(ambient);
+        const spot = new THREE.PointLight(0xd4af37, 2);
+        spot.position.set(0, 10, 0);
+        scene.add(spot);
+
+        /** 3D WORLD BUILDING **/
+        const floor = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshStandardMaterial({ color: 0x111111 }));
+        floor.rotation.x = -Math.PI / 2;
+        scene.add(floor);
+
+        // CREATE 3D POKER TABLE (The actual playable object)
+        function createPokerTable() {
+            const tableGroup = new THREE.Group();
+            const top = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 0.5, 32), new THREE.MeshStandardMaterial({ color: 0x076324 }));
+            const rail = new THREE.Mesh(new THREE.TorusGeometry(4, 0.2, 16, 100), new THREE.MeshStandardMaterial({ color: 0x222222 }));
+            rail.rotation.x = Math.PI / 2;
+            tableGroup.add(top, rail);
+            tableGroup.position.set(-10, 1, 0);
+            tableGroup.name = "poker_table";
+            scene.add(tableGroup);
+            return tableGroup;
         }
 
-        function show(id) {
-            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active-view'));
-            document.getElementById(id).classList.add('active-view');
-            vocal("Opening " + id.replace('view-', ''));
-        }
-
-        function playSlot(id, cost) {
-            if(gold < cost) return vocal("Insufficient Gold.");
-            gold -= cost;
-            document.getElementById('g-count').innerText = gold.toLocaleString();
+        // CREATE 3D SLOT MACHINES
+        let slotReels = [];
+        function createSlotMachine() {
+            const group = new THREE.Group();
+            const body = new THREE.Mesh(new THREE.BoxGeometry(2, 4, 2), new THREE.MeshStandardMaterial({ color: 0x333333 }));
             
-            const r = document.getElementById(id);
-            const res = [items[Math.floor(Math.random()*6)], items[Math.floor(Math.random()*6)], items[Math.floor(Math.random()*6)]];
-            r.innerText = res.join(' | ');
+            // The Spinning Part
+            const reel = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 1.5, 32), new THREE.MeshStandardMaterial({ color: 0xffffff }));
+            reel.rotation.z = Math.PI / 2;
+            reel.position.set(0, 2.5, 0.5);
+            group.add(body, reel);
+            group.position.set(10, 2, 0);
+            group.name = "slot_machine";
+            scene.add(group);
+            slotReels.push(reel);
+        }
+
+        const table = createPokerTable();
+        createSlotMachine();
+        camera.position.set(0, 10, 20);
+
+        /** THE GAME ENGINES (Logic) **/
+
+        // POKER/BLACKJACK ENGINE
+        const pokerEngine = {
+            deck: [],
+            hand: [],
+            dealerScore: 0,
+            active: false,
             
-            if(res[0] === res[1] && res[1] === res[2]) {
-                gold += (cost * 50);
-                vocal("Jackpot! Winner!");
-                document.getElementById('g-count').innerText = gold.toLocaleString();
+            deal() {
+                if(balance < 100) return alert("Not enough cash!");
+                updateBalance(-100);
+                this.active = true;
+                this.hand = [this.draw(), this.draw()];
+                document.getElementById('hit-btn').disabled = false;
+                document.getElementById('stand-btn').disabled = false;
+                this.renderHand();
+                document.getElementById('dealer-msg').innerText = "Playing Poker...";
+            },
+            draw() {
+                const vals = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+                return vals[Math.floor(Math.random() * vals.length)];
+            },
+            renderHand() {
+                const container = document.getElementById('player-hand');
+                container.innerHTML = '';
+                this.hand.forEach(card => {
+                    const div = document.createElement('div');
+                    div.className = 'playing-card';
+                    div.innerText = card;
+                    container.appendChild(div);
+                });
+            },
+            hit() {
+                this.hand.push(this.draw());
+                this.renderHand();
+                if(this.hand.length > 4) this.stand(); // Auto stand for demo
+            },
+            stand() {
+                const win = Math.random() > 0.5;
+                if(win) {
+                    updateBalance(300);
+                    document.getElementById('dealer-msg').innerText = "YOU WON $300!";
+                } else {
+                    document.getElementById('dealer-msg').innerText = "House Wins. Try Again.";
+                }
+                this.reset();
+            },
+            reset() {
+                document.getElementById('hit-btn').disabled = true;
+                document.getElementById('stand-btn').disabled = true;
+                this.active = false;
+            }
+        };
+
+        // SLOT MACHINE ENGINE
+        const slotEngine = {
+            isSpinning: false,
+            spin() {
+                if(this.isSpinning || balance < 50) return;
+                updateBalance(-50);
+                this.isSpinning = true;
+                document.getElementById('dealer-msg').innerText = "Spinning...";
+                
+                let start = Date.now();
+                const timer = setInterval(() => {
+                    slotReels[0].rotation.x += 0.5;
+                    if(Date.now() - start > 2000) {
+                        clearInterval(timer);
+                        this.finish();
+                    }
+                }, 30);
+            },
+            finish() {
+                this.isSpinning = false;
+                const win = Math.random() > 0.8;
+                if(win) {
+                    updateBalance(1000);
+                    document.getElementById('dealer-msg').innerText = "JACKPOT! $1,000";
+                } else {
+                    document.getElementById('dealer-msg').innerText = "No luck. Spin again!";
+                }
+            }
+        };
+
+        /** INTERACTION LOGIC **/
+        function updateBalance(amt) {
+            balance += amt;
+            document.getElementById('balance').innerText = balance.toLocaleString();
+        }
+
+        // ROOM TELEPORTATION
+        function gotoRoom(room) {
+            document.querySelectorAll('.game-hud').forEach(h => h.classList.remove('active-hud'));
+            if(room === 'poker') {
+                camera.position.set(-10, 6, 8);
+                controls.target.set(-10, 1, 0);
+                document.getElementById('poker-hud').classList.add('active-hud');
+                document.getElementById('dealer-msg').innerText = "Poker Table: Ready for Stakes";
+            } else {
+                camera.position.set(10, 5, 10);
+                controls.target.set(10, 2, 0);
+                document.getElementById('slots-hud').classList.add('active-hud');
+                document.getElementById('dealer-msg').innerText = "High Roller Slots: $50 per pull";
             }
         }
 
-        function deal() {
-            const arena = document.getElementById('poker-deck');
-            arena.innerHTML = '';
-            const suits = ['♠','♥','♦','♣'];
-            const face = ['A','K','Q','J','10'];
-            for(let i=0; i<5; i++) {
-                const c = document.createElement('div');
-                c.className = 'playing-card';
-                c.style.left = (80 + (i*100)) + 'px';
-                c.style.top = '160px';
-                c.innerText = face[Math.floor(Math.random()*5)] + suits[Math.floor(Math.random()*4)];
-                arena.appendChild(c);
-            }
-            vocal("New hand dealt.");
+        // MIC PTT LOGIC
+        function startVoice() {
+            document.getElementById('ptt-button').classList.add('active');
+            // Here you would connect to a WebRTC signal for real multiplayer
+        }
+        function stopVoice() {
+            document.getElementById('ptt-button').classList.remove('active');
         }
 
-        function postChat(m, u) {
-            const d = document.createElement('div');
-            d.className = 'bot-msg';
-            d.innerHTML = `<b>${u}:</b> ${m}`;
-            chat.appendChild(d);
-            chat.scrollTop = chat.scrollHeight;
+        // RENDER LOOP
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
         }
+        animate();
 
-        function autoBot() {
-            const bots = ["VegasKing", "LuckyLady", "CardShark", "Nicole_Fan"];
-            const msgs = ["Who's at the high roller slot?", "The theater is playing great stuff.", "Just hit a straight flush!", "Let's go 2026!"];
-            postChat(msgs[Math.floor(Math.random()*4)], bots[Math.floor(Math.random()*4)]);
-        }
-
-        function vocal(t) {
-            const s = new SpeechSynthesisUtterance(t);
-            s.rate = 0.9;
-            window.speechSynthesis.speak(s);
-        }
-
-        async function initCam() {
-            const av = document.getElementById('user-av');
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                av.innerHTML = '<video id="feed" autoplay style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></video>';
-                document.getElementById('feed').srcObject = stream;
-            } catch(e) {
-                alert("Cam Blocked.");
-            }
-        }
+        // RESIZE
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
 </body>
 </html>
